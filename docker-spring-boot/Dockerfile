@@ -1,21 +1,13 @@
-# For Java 8, try this
-# FROM openjdk:8-jdk-alpine
+FROM alpine/git
+WORKDIR /app
+RUN git clone https://github.com/shasidhar-bridgeitsol/test.git 
 
-# For Java 11, try this
-FROM adoptopenjdk/openjdk11:alpine-jre
+FROM maven:3.5-jdk-8-alpine
+WORKDIR /app
+COPY --from=0 /app/test/app 
+RUN mvn install 
 
-# Refer to Maven build -> finalName
-ARG JAR_FILE=target/spring-boot-web.jar
-
-# cd /opt/app
-WORKDIR /opt/app
-
-# cp target/spring-boot-web.jar /opt/app/app.jar
-COPY ${JAR_FILE} app.jar
-
-# java -jar /opt/app/app.jar
-ENTRYPOINT ["java","-jar","app.jar"]
-
-## sudo docker run -p 8080:8080 -t docker-spring-boot:1.0
-## sudo docker run -p 80:8080 -t docker-spring-boot:1.0
-## sudo docker run -p 443:8443 -t docker-spring-boot:1.0
+FROM openjdk:8-jre-alpine
+WORKDIR /app
+COPY --from=1 /app/target/pring-boot-web.jar /app 
+CMD ["java -jar pring-boot-web.jar"] 
